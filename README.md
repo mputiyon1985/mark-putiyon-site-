@@ -29,3 +29,5 @@ Add one secret under Settings > Secrets and variables > Actions:
 The Vercel team and project IDs are set in `.github/workflows/deploy.yml` (they are identifiers, not credentials).
 
 Recommended: protect `main` (Settings > Branches) and require the `test` check to pass before merging.
+
+<!-- pipeline test: safe to discard -->
