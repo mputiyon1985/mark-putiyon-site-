@@ -1,7 +1,7 @@
 // Site checks for a static site. Exits non-zero on any failure, which blocks deployment.
 // Run: node scripts/check-site.mjs
 import { readFileSync, existsSync, statSync, readdirSync } from "node:fs";
-import { join } from "node:path";
+import { join, relative, resolve } from "node:path";
 
 const root = process.cwd();
 const failures = [];
@@ -18,35 +18,50 @@ if (existsSync(join(root, "vercel.json"))) {
   fail("vercel.json is missing");
 }
 
-// 2. index.html must exist and have the basics
-const indexPath = join(root, "index.html");
-if (!existsSync(indexPath)) {
-  fail("index.html is missing");
-} else {
-  const html = readFileSync(indexPath, "utf8");
-
-  if (!/<title>[^<]{3,}<\/title>/i.test(html)) fail("index.html has no <title>");
-  if (!/<meta[^>]+name=["']description["']/i.test(html)) fail("index.html has no meta description");
-  if (!/<html[^>]+lang=/i.test(html)) fail('index.html <html> tag has no lang attribute');
-
-  // Every <img> needs alt text
-  for (const m of html.matchAll(/<img\b[^>]*>/gi)) {
-    if (!/\balt=/i.test(m[0])) fail(`<img> without alt: ${m[0].slice(0, 80)}`);
+// 2. Check each public HTML page and follow its local routes and fragments.
+const pages = new Map();
+const collect = (dir) => {
+  for (const entry of readdirSync(dir, { withFileTypes: true })) {
+    if (entry.name.startsWith(".") || ["node_modules", "scripts"].includes(entry.name)) continue;
+    const file = join(dir, entry.name);
+    if (entry.isDirectory()) collect(file);
+    else if (entry.name.endsWith(".html")) {
+      const html = readFileSync(file, "utf8");
+      const ids = new Set();
+      for (const tag of html.matchAll(/<[a-z][^>]*>/gi)) {
+        const id = /\s+id=["']([^"']+)["']/i.exec(tag[0])?.[1];
+        if (!id) continue;
+        if (ids.has(id)) fail(`${relative(root, file)}: duplicate id "${id}"`);
+        ids.add(id);
+      }
+      pages.set(file, { html, ids });
+    }
+  }
+};
+collect(root);
+if (!pages.has(join(root, "index.html"))) fail("index.html is missing");
+for (const [file, { html }] of pages) {
+  const label = relative(root, file);
+  if (!/<title>[^<]{3,}<\/title>/i.test(html)) fail(`${label}: no page title`);
+  if (!/<meta[^>]+name=["']description["']/i.test(html)) fail(`${label}: no meta description`);
+  if (!/<html[^>]+lang=/i.test(html)) fail(`${label}: no page language`);
+  for (const tag of html.matchAll(/<img\b[^>]*>/gi)) {
+    if (!/\balt=/i.test(tag[0])) fail(`${label}: <img> without alt: ${tag[0].slice(0, 80)}`);
   }
 
-  // 3. Every local file referenced from the page must exist
   const refs = new Set();
-  for (const m of html.matchAll(/(?:src|href|poster)\s*=\s*["']([^"'#?]+)/gi)) refs.add(m[1]);
-  for (const m of html.matchAll(/url\(\s*["']?([^"')#?]+)/gi)) refs.add(m[1]);
-
+  for (const m of html.matchAll(/(?:src|href|poster)\s*=\s*["']([^"']+)["']/gi)) refs.add(m[1]);
+  for (const m of html.matchAll(/url\(\s*["']?([^"')#?]+)/gi)) refs.add(m[1].trim());
   for (const ref of refs) {
     if (/^(https?:|mailto:|tel:|data:|\/\/|javascript:)/i.test(ref)) continue;
-    const rel = ref.replace(/^\//, "");
-    if (!rel) continue;
-    const full = join(root, rel);
-    // Pretty URLs (cleanUrls): "/foo" may be foo.html
-    if (!existsSync(full) && !existsSync(full + ".html")) {
-      fail(`Referenced file not found: ${ref}`);
+    const base = new URL(label, "https://site.test/");
+    const url = new URL(ref, base);
+    const local = resolve(root, "." + decodeURIComponent(url.pathname));
+    const candidates = [local, local + ".html", join(local, "index.html")];
+    const target = candidates.find((path) => existsSync(path) && statSync(path).isFile());
+    if (!target) fail(`${label}: referenced file not found: ${ref}`);
+    else if (url.hash && pages.has(target) && !pages.get(target).ids.has(decodeURIComponent(url.hash.slice(1)))) {
+      fail(`${label}: referenced section not found: ${ref}`);
     }
   }
 }
