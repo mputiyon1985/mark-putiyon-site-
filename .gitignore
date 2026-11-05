@@ -1,0 +1,6 @@
+stripe-strategy-call.json
+index.html.bak-*
+*.whl
+preview-2026-11-03-*.png
+.DS_Store
+node_modules/

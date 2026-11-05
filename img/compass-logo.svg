@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 110" width="320" height="110">
+  <defs>
+    <linearGradient id="ring" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0055A5"/>
+      <stop offset="100%" stop-color="#2EC4B6"/>
+    </linearGradient>
+    <linearGradient id="needle" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#2EC4B6"/>
+      <stop offset="50%" stop-color="#2EC4B6"/>
+      <stop offset="50.1%" stop-color="#FFFFFF"/>
+      <stop offset="100%" stop-color="#FFFFFF"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Compass icon (left) -->
+  <g transform="translate(8,8)">
+    <!-- Outer ring -->
+    <circle cx="47" cy="47" r="44" fill="none" stroke="url(#ring)" stroke-width="4"/>
+    <!-- Inner ring -->
+    <circle cx="47" cy="47" r="36" fill="#F8FAFC" stroke="#0055A5" stroke-width="1.5"/>
+    <!-- Cardinal tick marks (N/E/S/W) -->
+    <g stroke="#0055A5" stroke-width="2" stroke-linecap="round">
+      <line x1="47" y1="14" x2="47" y2="20"/>
+      <line x1="80" y1="47" x2="74" y2="47"/>
+      <line x1="47" y1="80" x2="47" y2="74"/>
+      <line x1="14" y1="47" x2="20" y2="47"/>
+    </g>
+    <!-- Diagonal tick marks (NE/SE/SW/NW) -->
+    <g stroke="#94A3B8" stroke-width="1" stroke-linecap="round">
+      <line x1="70.3" y1="23.7" x2="67.1" y2="26.9"/>
+      <line x1="70.3" y1="70.3" x2="67.1" y2="67.1"/>
+      <line x1="23.7" y1="70.3" x2="26.9" y2="67.1"/>
+      <line x1="23.7" y1="23.7" x2="26.9" y2="26.9"/>
+    </g>
+    <!-- Compass needle (N pointing) -->
+    <polygon points="47,17 53,47 47,47" fill="#0055A5"/>
+    <polygon points="47,77 53,47 47,47" fill="#2EC4B6"/>
+    <polygon points="47,17 41,47 47,47" fill="#2EC4B6" opacity="0.85"/>
+    <polygon points="47,77 41,47 47,47" fill="#0055A5" opacity="0.85"/>
+    <!-- Center pivot -->
+    <circle cx="47" cy="47" r="4" fill="#0055A5"/>
+    <circle cx="47" cy="47" r="2" fill="#F8FAFC"/>
+  </g>
+
+  <!-- Wordmark (right) -->
+  <g transform="translate(115,0)">
+    <text x="0" y="55" font-family="Helvetica, Arial, sans-serif" font-size="38" font-weight="700" fill="#0055A5" letter-spacing="-0.5">Compass</text>
+    <text x="0" y="80" font-family="Helvetica, Arial, sans-serif" font-size="11" font-weight="500" fill="#2EC4B6" letter-spacing="2.5">EHR · MULTI-TENANT</text>
+  </g>
+</svg>
