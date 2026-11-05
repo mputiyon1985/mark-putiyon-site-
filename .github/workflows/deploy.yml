@@ -15,8 +15,10 @@ permissions:
   contents: read
 
 env:
-  VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+  # These two IDs identify the Vercel project; they are not credentials.
+  # The only secret needed is VERCEL_TOKEN.
+  VERCEL_ORG_ID: team_wxZVNJKn11EBhoxPuTP0s8Rb
+  VERCEL_PROJECT_ID: prj_hMVFcxldVMOhA1ilAPIhw4m42wyP
 
 jobs:
   test:

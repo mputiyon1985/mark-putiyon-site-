@@ -18,14 +18,14 @@ node scripts/check-site.mjs
 
 The checks cover: valid `vercel.json`, page title, description and language, alt text on every image, every referenced local file exists, and no asset over 2 MB.
 
-## One-time setup (repository secrets)
+## One-time setup (repository secret)
 
-Add these under Settings > Secrets and variables > Actions:
+Add one secret under Settings > Secrets and variables > Actions:
 
 | Secret | Where to get it |
 | --- | --- |
 | `VERCEL_TOKEN` | Vercel > Account Settings > Tokens |
-| `VERCEL_ORG_ID` | `team_wxZVNJKn11EBhoxPuTP0s8Rb` |
-| `VERCEL_PROJECT_ID` | `prj_hMVFcxldVMOhA1ilAPIhw4m42wyP` |
+
+The Vercel team and project IDs are set in `.github/workflows/deploy.yml` (they are identifiers, not credentials).
 
 Recommended: protect `main` (Settings > Branches) and require the `test` check to pass before merging.
