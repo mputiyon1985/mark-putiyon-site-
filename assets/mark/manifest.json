@@ -1,0 +1,71 @@
+{
+  "description": "SHA-256 manifest for the Mark Putiyon headshot. Width, height, byte length, and sha256 were measured from these files.",
+  "site_file": "headshot.png",
+  "site_file_note": "headshot.png is the file referenced by the page image, Open Graph og:image, and JSON-LD image. It is byte-identical to assets/mark/mark-putiyon-headshot-1024.png.",
+  "files": [
+    {
+      "path": "assets/mark/mark-putiyon-headshot-2026-11-07-original.png",
+      "role": "original",
+      "width": 1254,
+      "height": 1254,
+      "bytes": 2190746,
+      "sha256": "f5dd5078a9dbaa5aaa58548c43ede0c1421a57e85c1c6db8ee4eeb930d1198a8"
+    },
+    {
+      "path": "assets/mark/mark-putiyon-headshot-1024.png",
+      "role": "optimized-png",
+      "width": 1024,
+      "height": 1024,
+      "bytes": 1341028,
+      "sha256": "a43acce8b65617e09507c59cbf5373ff58aed9886e1f556e4d30ee9c004dd005"
+    },
+    {
+      "path": "assets/mark/mark-putiyon-headshot-1024.webp",
+      "role": "optimized-webp",
+      "width": 1024,
+      "height": 1024,
+      "bytes": 117468,
+      "sha256": "e09655cc790e3e95061c774bb98fe3477af34f00954f62d31b36eea907fa2fe3"
+    },
+    {
+      "path": "assets/mark/mark-putiyon-headshot-512.png",
+      "role": "optimized-png",
+      "width": 512,
+      "height": 512,
+      "bytes": 335591,
+      "sha256": "eac89901c9723398b2ee74197858732df279a1888899333835a3b013cd505f00"
+    },
+    {
+      "path": "assets/mark/mark-putiyon-headshot-512.webp",
+      "role": "optimized-webp",
+      "width": 512,
+      "height": 512,
+      "bytes": 30152,
+      "sha256": "053b16189aff2f0a0e7c6da75a306e769d15f5a62ae864e4b0e3c6ee96bc8849"
+    },
+    {
+      "path": "assets/mark/mark-putiyon-headshot-256.png",
+      "role": "optimized-png",
+      "width": 256,
+      "height": 256,
+      "bytes": 82617,
+      "sha256": "40153428005c0b4b33b4f2d0fb62e81861874db77fbf2f25382e467d517c559d"
+    },
+    {
+      "path": "assets/mark/mark-putiyon-headshot-256.webp",
+      "role": "optimized-webp",
+      "width": 256,
+      "height": 256,
+      "bytes": 8986,
+      "sha256": "66eda9a638cf05febce8bb0ecb951b3f4a40f420a055a78f137f07177b512866"
+    },
+    {
+      "path": "headshot.png",
+      "role": "site",
+      "width": 1024,
+      "height": 1024,
+      "bytes": 1341028,
+      "sha256": "a43acce8b65617e09507c59cbf5373ff58aed9886e1f556e4d30ee9c004dd005"
+    }
+  ]
+}

@@ -76,15 +76,24 @@ if (existsSync(join(root, "sitemap.xml"))) {
   fail("sitemap.xml is missing");
 }
 
-// 4. Guard against huge assets slowing the site (limit 2 MB each)
+// 4. Guard against huge assets slowing the site (limit 2 MB each).
+// The dated source portrait is a reusable original, not a page asset, and is
+// listed in .vercelignore so it is not uploaded with the site.
 const MAX = 2 * 1024 * 1024;
+const SOURCE_OVERSIZE_OK = new Set([
+  "assets/mark/mark-putiyon-headshot-2026-11-07-original.png",
+]);
 const walk = (dir) => {
   for (const name of readdirSync(dir)) {
     if (name === "node_modules" || name === ".git" || name === ".github") continue;
     const p = join(dir, name);
     const s = statSync(p);
     if (s.isDirectory()) walk(p);
-    else if (s.size > MAX) fail(`File over 2 MB: ${p.replace(root + "/", "")} (${(s.size / 1048576).toFixed(1)} MB)`);
+    else if (s.size > MAX) {
+      const rel = p.slice(root.length + 1).split("\\").join("/");
+      if (SOURCE_OVERSIZE_OK.has(rel)) continue;
+      fail(`File over 2 MB: ${rel} (${(s.size / 1048576).toFixed(1)} MB)`);
+    }
   }
 };
 walk(root);
