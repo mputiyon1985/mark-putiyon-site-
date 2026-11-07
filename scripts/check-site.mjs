@@ -18,20 +18,28 @@ if (existsSync(join(root, "vercel.json"))) {
   fail("vercel.json is missing");
 }
 
-// 2. index.html must exist and have the basics
-const indexPath = join(root, "index.html");
-if (!existsSync(indexPath)) {
-  fail("index.html is missing");
-} else {
-  const html = readFileSync(indexPath, "utf8");
+// 2. Every HTML page must have the basics (index.html is required)
+if (!existsSync(join(root, "index.html"))) fail("index.html is missing");
+const pages = readdirSync(root).filter((f) => f.endsWith(".html"));
+for (const page of pages) {
+  const html = readFileSync(join(root, page), "utf8");
+  const tag = `[${page}]`;
 
-  if (!/<title>[^<]{3,}<\/title>/i.test(html)) fail("index.html has no <title>");
-  if (!/<meta[^>]+name=["']description["']/i.test(html)) fail("index.html has no meta description");
-  if (!/<html[^>]+lang=/i.test(html)) fail('index.html <html> tag has no lang attribute');
+  if (!/<title>[^<]{3,}<\/title>/i.test(html)) fail(`${tag} has no <title>`);
+  if (!/<meta[^>]+name=["']description["']/i.test(html)) fail(`${tag} has no meta description`);
+  if (!/<html[^>]+lang=/i.test(html)) fail(`${tag} <html> tag has no lang attribute`);
+  if (!/<link[^>]+rel=["']canonical["']/i.test(html)) fail(`${tag} has no canonical link`);
+  const h1s = (html.match(/<h1\b/gi) || []).length;
+  if (h1s !== 1) fail(`${tag} must have exactly one <h1> (found ${h1s})`);
 
   // Every <img> needs alt text
   for (const m of html.matchAll(/<img\b[^>]*>/gi)) {
-    if (!/\balt=/i.test(m[0])) fail(`<img> without alt: ${m[0].slice(0, 80)}`);
+    if (!/\balt=/i.test(m[0])) fail(`${tag} <img> without alt: ${m[0].slice(0, 80)}`);
+  }
+
+  // JSON-LD blocks must be valid JSON
+  for (const m of html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/gi)) {
+    try { JSON.parse(m[1]); } catch (e) { fail(`${tag} invalid JSON-LD: ${e.message}`); }
   }
 
   // 3. Every local file referenced from the page must exist
@@ -41,14 +49,31 @@ if (!existsSync(indexPath)) {
 
   for (const ref of refs) {
     if (/^(https?:|mailto:|tel:|data:|\/\/|javascript:)/i.test(ref)) continue;
+    if (ref.startsWith("/_vercel/")) continue; // provided by Vercel at runtime
     const rel = ref.replace(/^\//, "");
     if (!rel) continue;
     const full = join(root, rel);
     // Pretty URLs (cleanUrls): "/foo" may be foo.html
     if (!existsSync(full) && !existsSync(full + ".html")) {
-      fail(`Referenced file not found: ${ref}`);
+      fail(`${tag} referenced file not found: ${ref}`);
     }
   }
+}
+
+// Sitemap: every listed URL must exist, and every page must be listed
+if (existsSync(join(root, "sitemap.xml"))) {
+  const sm = readFileSync(join(root, "sitemap.xml"), "utf8");
+  const locs = [...sm.matchAll(/<loc>https:\/\/mark\.putiyon\.net\/([^<]*)<\/loc>/g)].map((m) => m[1]);
+  for (const l of locs) {
+    const f = l === "" ? "index.html" : l + ".html";
+    if (!existsSync(join(root, f))) fail(`sitemap lists a page that does not exist: /${l}`);
+  }
+  for (const page of pages) {
+    const l = page === "index.html" ? "" : page.replace(/\.html$/, "");
+    if (!locs.includes(l)) fail(`page missing from sitemap.xml: ${page}`);
+  }
+} else {
+  fail("sitemap.xml is missing");
 }
 
 // 4. Guard against huge assets slowing the site (limit 2 MB each)
